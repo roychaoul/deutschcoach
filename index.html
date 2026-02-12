@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0A0E17">
+<meta name="description" content="DeutschCoach - Dein KI-Sprachpartner zum Deutsch lernen">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>DeutschCoach</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0E17;--bg2:#111827;--cd:#1A2235;--cd2:#1F2A40;--gd:#F5A623;--gdd:rgba(245,166,35,.15);--bl:#3B82F6;--gn:#10B981;--rd:#EF4444;--pu:#8B5CF6;--or:#F97316;--tl:#14B8A6;--t1:#F1F5F9;--t2:#94A3B8;--t3:#64748B;--bd:rgba(255,255,255,.06);--ba:rgba(245,166,35,.3);--sh:0 4px 24px rgba(0,0,0,.4);--r:16px;--rs:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--t1);min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.amb{position:fixed;inset:0;z-index:0;pointer-events:none}.amb::before{content:'';position:absolute;top:-30%;left:-20%;width:70%;height:70%;background:radial-gradient(ellipse,rgba(245,166,35,.06),transparent 70%);animation:dr 20s ease-in-out infinite}.amb::after{content:'';position:absolute;bottom:-20%;right:-20%;width:60%;height:60%;background:radial-gradient(ellipse,rgba(59,130,246,.04),transparent 70%);animation:dr 25s ease-in-out infinite reverse}@keyframes dr{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+/* Header */
+.hdr{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);backdrop-filter:blur(20px);background:rgba(10,14,23,.85);position:sticky;top:0;z-index:100}
+.hdr-l{display:flex;align-items:center;gap:10px}
+.logo{width:36px;height:36px;background:linear-gradient(135deg,var(--gd),#E8930C);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--bg);font-family:'DM Serif Display',serif;box-shadow:0 2px 10px rgba(245,166,35,.3)}
+.hdr-t{font-family:'DM Serif Display',serif;font-size:18px}.hdr-s{font-size:9px;color:var(--t3);font-weight:500;letter-spacing:.5px;text-transform:uppercase}
+.streak{display:flex;align-items:center;gap:4px;background:var(--gdd);border:1px solid rgba(245,166,35,.2);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:var(--gd)}
+/* Screens */
+.scr{display:none;flex-direction:column;flex:1}.scr.on{display:flex}
+.home{padding:16px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+/* Level selector */
+.lvs{display:flex;gap:3px;margin-bottom:14px;background:var(--cd);border-radius:11px;padding:3px;border:1px solid var(--bd)}
+.lvb{flex:1;padding:9px 2px;border:none;background:none;color:var(--t3);font-family:inherit;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;transition:all .2s;text-align:center}
+.lvb.on{color:var(--bg)}
+.lvb[data-l=A1].on{background:var(--gn)}.lvb[data-l=A2].on{background:var(--tl)}.lvb[data-l=B1].on{background:var(--bl)}.lvb[data-l=B2].on{background:var(--pu)}.lvb[data-l=C1].on{background:var(--or)}
+.lvi{border-radius:var(--r);padding:14px;margin-bottom:14px;border:1px solid rgba(255,255,255,.08)}
+.lvi h2{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:3px}
+.lvi p{font-size:11px;color:var(--t2);line-height:1.5}
+.lvt{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.lvt span{font-size:9px;font-weight:600;padding:2px 7px;border-radius:5px;background:rgba(255,255,255,.06);color:var(--t2)}
+/* Stats */
+.sts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+.st{background:var(--cd);border:1px solid var(--bd);border-radius:var(--rs);padding:10px;text-align:center}
+.st b{font-family:'DM Serif Display',serif;font-size:20px;color:var(--gd);display:block}
+.st small{font-size:9px;color:var(--t3);display:block;margin-top:1px}
+/* Quick actions */
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.qab{background:var(--cd);border:1px solid var(--bd);border-radius:var(--rs);padding:11px;color:var(--t1);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;justify-content:center}
+.qab:hover{border-color:var(--ba);background:var(--cd2)}
+/* Category */
+.cs{margin-bottom:14px}
+.ch{display:flex;align-items:center;gap:7px;margin-bottom:7px;cursor:pointer;user-select:none;padding:3px 0}
+.ch .ci{font-size:16px}.ch .cn{font-family:'DM Serif Display',serif;font-size:14px;flex:1}
+.ch .cc{font-size:9px;color:var(--t3);background:var(--cd);padding:2px 7px;border-radius:9px;font-weight:600}
+.ch .ca{color:var(--t3);font-size:11px;transition:transform .2s}.ch .ca.op{transform:rotate(90deg)}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.sc{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:12px 10px;cursor:pointer;transition:all .2s;overflow:hidden}
+.sc:hover{border-color:var(--ba);transform:translateY(-1px);box-shadow:var(--sh)}
+.sc .si{font-size:22px;margin-bottom:5px;display:block}.sc .sn{font-weight:600;font-size:11px;margin-bottom:2px;line-height:1.3}
+.sc .sd{font-size:9px;color:var(--t3);line-height:1.3}.sc .sl{display:inline-block;margin-top:5px;font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.4px}
+.bA1{background:rgba(16,185,129,.15);color:var(--gn)}.bA2{background:rgba(20,184,166,.15);color:var(--tl)}.bB1{background:rgba(59,130,246,.15);color:var(--bl)}.bB2{background:rgba(139,92,246,.15);color:var(--pu)}.bC1{background:rgba(249,115,22,.15);color:var(--or)}
+/* Chat */
+.chdr{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;backdrop-filter:blur(20px);background:rgba(10,14,23,.9)}
+.bk{background:none;border:none;color:var(--t2);font-size:18px;cursor:pointer;padding:3px;display:flex;align-items:center}
+.cinf{flex:1}.cinf .n{font-weight:600;font-size:13px}.cinf .h{font-size:9px;color:var(--t3)}
+.ctg{font-size:9px;font-weight:700;padding:3px 7px;border-radius:5px}
+.cstb{background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:3px}
+.msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+.msg{max-width:88%;padding:11px 13px;border-radius:14px;font-size:13px;line-height:1.5;animation:mi .3s ease}
+@keyframes mi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.bot{background:var(--cd);border:1px solid var(--bd);border-bottom-left-radius:4px;align-self:flex-start}
+.msg.usr{background:linear-gradient(135deg,rgba(245,166,35,.2),rgba(245,166,35,.08));border:1px solid rgba(245,166,35,.15);border-bottom-right-radius:4px;align-self:flex-end}
+.msg.sys{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.1);align-self:center;text-align:center;font-size:10px;color:var(--bl);max-width:92%;border-radius:9px;padding:6px 12px}
+.cor{margin-top:7px;padding:8px 10px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.1);border-radius:8px;font-size:12px}
+.cor .lb{font-size:8px;text-transform:uppercase;letter-spacing:.8px;color:var(--rd);font-weight:700;margin-bottom:3px}
+.cor .cw{text-decoration:line-through;color:var(--rd);opacity:.7}.cor .cr{color:var(--gn);font-weight:600}
+.cor .ce{margin-top:4px;font-size:10px;color:var(--t2);line-height:1.5}
+.voc{margin-top:7px;padding:8px 10px;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.1);border-radius:8px;font-size:11px;color:var(--bl)}
+.hnt{margin-top:7px;padding:8px 10px;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.1);border-radius:8px;font-size:11px;color:var(--pu)}
+.voc .lb,.hnt .lb{font-size:8px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:2px}
+.spk{display:inline-flex;align-items:center;gap:3px;background:rgba(255,255,255,.06);border:none;border-radius:5px;padding:2px 6px;margin-top:5px;font-size:9px;color:var(--t3);cursor:pointer;font-family:inherit}.spk:hover{background:rgba(255,255,255,.1)}
+.typ{display:flex;gap:4px;padding:11px 13px;align-self:flex-start;background:var(--cd);border:1px solid var(--bd);border-radius:14px;border-bottom-left-radius:4px}
+.dot{width:5px;height:5px;background:var(--t3);border-radius:50%;animation:tb 1.4s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
+/* Input */
+.ibar{padding:8px 12px;border-top:1px solid var(--bd);background:rgba(10,14,23,.95);backdrop-filter:blur(20px)}
+.mtb{display:flex;gap:2px;margin-bottom:6px;background:var(--cd);border-radius:8px;padding:2px}
+.mt{flex:1;padding:5px;border:none;background:none;color:var(--t3);font-family:inherit;font-size:10px;font-weight:600;border-radius:6px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:4px}
+.mt.on{background:rgba(245,166,35,.15);color:var(--gd)}
+.tir{display:flex;gap:6px;align-items:flex-end}
+.tir textarea{flex:1;background:var(--cd);border:1px solid var(--bd);border-radius:11px;padding:9px 12px;color:var(--t1);font-family:inherit;font-size:14px;resize:none;outline:none;min-height:40px;max-height:100px;transition:border-color .2s;line-height:1.4}
+.tir textarea:focus{border-color:var(--ba)}.tir textarea::placeholder{color:var(--t3)}
+.snd{width:40px;height:40px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gd),#E8930C);color:var(--bg);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.via{display:none;flex-direction:column;align-items:center;gap:8px;padding:4px 0}.via.on{display:flex}
+.tia.off{display:none}
+.mic{width:54px;height:54px;border-radius:50%;border:3px solid var(--gd);background:rgba(245,166,35,.1);color:var(--gd);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mic.rec{animation:mp 1.5s ease-in-out infinite;border-color:var(--rd);background:rgba(239,68,68,.15);color:var(--rd)}
+@keyframes mp{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
+.vst{font-size:10px;color:var(--t3);font-weight:500}
+.vtr{font-size:11px;color:var(--t2);background:var(--cd);border-radius:8px;padding:7px 10px;width:100%;text-align:center;font-style:italic}
+/* Modal */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}.mo.on{display:flex}
+.moc{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:22px 18px;width:100%;max-width:400px;box-shadow:var(--sh)}
+.moc h3{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:5px}
+.moc p{font-size:11px;color:var(--t2);margin-bottom:14px;line-height:1.5}
+.moc input,.moc select{width:100%;background:var(--cd);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 12px;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;margin-bottom:12px}
+.moc input:focus{border-color:var(--ba)}.moc input::placeholder{color:var(--t3)}
+.moa{display:flex;gap:7px}
+.mob{flex:1;padding:10px;border-radius:var(--rs);border:none;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.mob.p{background:linear-gradient(135deg,var(--gd),#E8930C);color:var(--bg)}.mob.s{background:var(--cd);color:var(--t2);border:1px solid var(--bd)}
+.apis{font-size:10px;margin-top:8px;padding:7px 9px;border-radius:7px;display:none}
+.apis.ok{display:block;background:rgba(16,185,129,.1);color:var(--gn);border:1px solid rgba(16,185,129,.2)}
+.apis.er{display:block;background:rgba(239,68,68,.1);color:var(--rd);border:1px solid rgba(239,68,68,.2)}
+/* Settings */
+.setp{display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border-top:1px solid var(--bd);border-radius:16px 16px 0 0;padding:18px 16px;z-index:500;box-shadow:0 -8px 40px rgba(0,0,0,.5);max-height:75vh;overflow-y:auto}.setp.on{display:block}
+.setp h3{font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.setp .x{background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer}
+.sr{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd)}
+.sr .sl{font-size:12px;font-weight:500}.sr .sl small{display:block;font-size:9px;color:var(--t3);font-weight:400;margin-top:1px}
+.tg{width:40px;height:21px;background:var(--cd);border-radius:11px;position:relative;cursor:pointer;border:1px solid var(--bd);transition:all .2s;flex-shrink:0}
+.tg.on{background:rgba(245,166,35,.2);border-color:var(--gd)}
+.tg::after{content:'';position:absolute;width:15px;height:15px;background:var(--t3);border-radius:50%;top:2px;left:2px;transition:all .2s}
+.tg.on::after{transform:translateX(19px);background:var(--gd)}
+/* Nav */
+.nav{display:flex;border-top:1px solid var(--bd);background:rgba(10,14,23,.95);backdrop-filter:blur(20px);padding:5px 0 calc(5px + env(safe-area-inset-bottom))}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;background:none;border:none;color:var(--t3);font-family:inherit;font-size:8px;font-weight:600;cursor:pointer;transition:color .2s}
+.ni .ic{font-size:18px}.ni.on{color:var(--gd)}
+/* Mistakes & History */
+.mist{padding:14px;flex:1;overflow-y:auto}
+.mk{background:var(--cd);border:1px solid var(--bd);border-radius:var(--rs);padding:12px;margin-bottom:7px}
+.mk .mw{color:var(--rd);text-decoration:line-through;font-size:12px}.mk .mr{color:var(--gn);font-weight:600;font-size:12px;margin-top:2px}
+.mk .me{font-size:10px;color:var(--t3);margin-top:4px;padding-top:4px;border-top:1px solid var(--bd)}
+.mk .mc{display:inline-block;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:2px 6px;border-radius:4px;margin-bottom:5px}
+.cg{background:rgba(239,68,68,.1);color:var(--rd)}.cv{background:rgba(59,130,246,.1);color:var(--bl)}.cw{background:rgba(139,92,246,.1);color:var(--pu)}
+/* History cards */
+.hc{background:var(--cd);border:1px solid var(--bd);border-radius:var(--rs);padding:12px;margin-bottom:7px;cursor:pointer;transition:all .2s}
+.hc:hover{border-color:var(--ba)}
+.hc .ht{font-weight:600;font-size:12px;margin-bottom:2px}.hc .hd{font-size:10px;color:var(--t3)}
+.hc .hm{font-size:9px;color:var(--t2);margin-top:4px;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.htabs{display:flex;gap:3px;margin-bottom:12px;background:var(--cd);border-radius:8px;padding:2px}
+.htab{flex:1;padding:7px;border:none;background:none;color:var(--t3);font-family:inherit;font-size:11px;font-weight:600;border-radius:6px;cursor:pointer;text-align:center;transition:all .2s}
+.htab.on{background:rgba(245,166,35,.15);color:var(--gd)}
+/* Export/Import bar */
+.eibar{display:flex;gap:6px;margin-bottom:12px}
+.eib{flex:1;padding:9px;background:var(--cd);border:1px solid var(--bd);border-radius:8px;font-family:inherit;font-size:10px;font-weight:600;color:var(--t1);cursor:pointer;text-align:center;transition:all .2s}
+.eib:hover{border-color:var(--ba)}
+.empty{text-align:center;padding:40px 16px;color:var(--t3)}.empty .ic{font-size:36px;margin-bottom:8px}.empty p{font-size:12px}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="amb"></div>
+<div class="app">
+
+<!-- HOME -->
+<div class="scr on" id="homeScr">
+<div class="hdr"><div class="hdr-l"><div class="logo">D</div><div><div class="hdr-t">DeutschCoach</div><div class="hdr-s">KI-Sprachpartner</div></div></div><div class="streak">🔥 <span id="strk">0</span> Tage</div></div>
+<div class="home">
+<div class="lvs" id="lvlS"></div>
+<div class="lvi" id="lvI"></div>
+<div class="sts"><div class="st"><b id="s1">0</b><small>Gespräche</small></div><div class="st"><b id="s2">0</b><small>Korrekturen</small></div><div class="st"><b id="s3">0</b><small>Neue Wörter</small></div></div>
+<div class="qa">
+<button class="qab" onclick="startFree()">💬 Freies Gespräch</button>
+<button class="qab" onclick="showApi()">🔑 API-Key</button>
+<button class="qab" onclick="go('hist')">📂 Gespeicherte Chats</button>
+<button class="qab" onclick="go('data')">💾 Daten sichern</button>
+</div>
+<div id="scenBox"></div>
+</div>
+<nav class="nav">
+<button class="ni on" onclick="go('home')"><span class="ic">🏠</span>Home</button>
+<button class="ni" onclick="startFree()"><span class="ic">💬</span>Chat</button>
+<button class="ni" onclick="go('hist')"><span class="ic">📂</span>Verlauf</button>
+<button class="ni" onclick="go('mist')"><span class="ic">📝</span>Fehler</button>
+</nav>
+</div>
+
+<!-- CHAT -->
+<div class="scr" id="chatScr">
+<div class="chdr"><button class="bk" onclick="endChat()">←</button><div class="cinf"><div class="n" id="chN">💬</div><div class="h" id="chH"></div></div><span class="ctg" id="chT">A1</span><button class="cstb" onclick="togSet()">⚙️</button></div>
+<div class="msgs" id="msgs"></div>
+<div class="ibar">
+<div class="mtb"><button class="mt on" id="mtT" onclick="setMode('t')">⌨️ Tippen</button><button class="mt" id="mtV" onclick="setMode('v')">🎤 Sprechen</button></div>
+<div class="tia" id="tia"><div class="tir"><textarea id="inp" placeholder="Schreib auf Deutsch..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea><button class="snd" onclick="send()">➤</button></div></div>
+<div class="via" id="via"><div class="vtr" id="vtr">Drücke und sprich...</div><button class="mic" id="micB" onclick="togRec()">🎤</button><div class="vst" id="vst">Tippe zum Sprechen</div></div>
+</div>
+<div class="setp" id="setP">
+<h3>Einstellungen<button class="x" onclick="togSet()">✕</button></h3>
+<div class="sr"><div class="sl">Automatische Korrektur<small>Jeden Satz korrigieren</small></div><div class="tg on" id="tgCor" onclick="togS(this)"></div></div>
+<div class="sr"><div class="sl">Vokabelhilfe<small>Neue Wörter erklären</small></div><div class="tg on" id="tgVoc" onclick="togS(this)"></div></div>
+<div class="sr"><div class="sl">Aussprache-Tipps</div><div class="tg on" id="tgPro" onclick="togS(this)"></div></div>
+<div class="sr"><div class="sl">Strenger Modus<small>Nur Deutsch</small></div><div class="tg" id="tgStr" onclick="togS(this)"></div></div>
+<div class="sr"><div class="sl">Langsames Tempo<small>An Niveau anpassen</small></div><div class="tg on" id="tgSlo" onclick="togS(this)"></div></div>
+</div>
+</div>
+
+<!-- HISTORY & MISTAKES -->
+<div class="scr" id="histScr">
+<div class="hdr"><div class="hdr-l"><button class="bk" onclick="go('home')" style="margin-right:4px">←</button><div><div class="hdr-t">Verlauf & Fehler</div><div class="hdr-s">Deine Lerngeschichte</div></div></div></div>
+<div class="mist">
+<div class="htabs"><button class="htab on" id="htC" onclick="showHTab('chats')">💬 Chats</button><button class="htab" id="htM" onclick="showHTab('mist')">📝 Fehler</button></div>
+<div class="eibar"><button class="eib" onclick="exportData()">📤 Exportieren</button><button class="eib" onclick="$('impF').click()">📥 Importieren</button><input type="file" id="impF" accept=".json" style="display:none" onchange="importData(event)"></div>
+<div id="histBox"></div>
+</div>
+<nav class="nav">
+<button class="ni" onclick="go('home')"><span class="ic">🏠</span>Home</button>
+<button class="ni" onclick="startFree()"><span class="ic">💬</span>Chat</button>
+<button class="ni on"><span class="ic">📂</span>Verlauf</button>
+<button class="ni" onclick="go('mist')"><span class="ic">📝</span>Fehler</button>
+</nav>
+</div>
+
+<!-- DATA SCREEN (alias for hist) -->
+<div class="scr" id="mistScr">
+<div class="hdr"><div class="hdr-l"><button class="bk" onclick="go('home')" style="margin-right:4px">←</button><div><div class="hdr-t">Meine Fehler</div><div class="hdr-s">Lerne aus Fehlern</div></div></div></div>
+<div class="mist" id="mistC"><div class="empty"><div class="ic">📝</div><p>Noch keine Fehler!</p></div></div>
+<nav class="nav">
+<button class="ni" onclick="go('home')"><span class="ic">🏠</span>Home</button>
+<button class="ni" onclick="startFree()"><span class="ic">💬</span>Chat</button>
+<button class="ni" onclick="go('hist')"><span class="ic">📂</span>Verlauf</button>
+<button class="ni on"><span class="ic">📝</span>Fehler</button>
+</nav>
+</div>
+
+</div>
+
+<!-- API Modal -->
+<div class="mo" id="apiMo"><div class="moc"><h3>🔑 Claude API-Key</h3><p>Dein Key wird nur lokal gespeichert und nie geteilt.</p><input type="password" id="apiIn" placeholder="sk-ant-api03-..." autocomplete="off"><div class="moa"><button class="mob s" onclick="closeApi()">Abbrechen</button><button class="mob p" onclick="saveApi()">Speichern</button></div><div class="apis" id="apiS"></div></div></div>
+
+<script>
+// PWA Service Worker
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').then(()=>console.log('SW registered')).catch(e=>console.log('SW failed',e));}
+
+const LV={
+A1:{nm:'A1 — Anfänger',co:'var(--gn)',bg:'rgba(16,185,129,.08)',bd:'rgba(16,185,129,.15)',ds:'Einfache Sätze, Begrüßungen, sich vorstellen.',tg:['Präsens','W-Fragen','Nominativ','Grundwortschatz'],rt:.75,gr:'Präsens, Nominativ/Akkusativ, Artikel, einfache Satzstruktur'},
+A2:{nm:'A2 — Grundkenntnisse',co:'var(--tl)',bg:'rgba(20,184,166,.08)',bd:'rgba(20,184,166,.15)',ds:'Alltag, Vergangenheit, Wünsche. Perfekt, Modalverben.',tg:['Perfekt','Modalverben','Dativ','Nebensätze'],rt:.8,gr:'Perfekt, Modalverben, Dativ, Nebensätze, trennbare Verben'},
+B1:{nm:'B1 — Mittelstufe',co:'var(--bl)',bg:'rgba(59,130,246,.08)',bd:'rgba(59,130,246,.15)',ds:'Meinungen, Pläne, Erfahrungen. Konjunktiv II.',tg:['Konjunktiv II','Relativsätze','Passiv','Präteritum'],rt:.85,gr:'Konjunktiv II (würde), Relativsätze, Passiv Präsens, Präteritum'},
+B2:{nm:'B2 — Obere Mittelstufe',co:'var(--pu)',bg:'rgba(139,92,246,.08)',bd:'rgba(139,92,246,.15)',ds:'Komplexe Diskussionen, Argumente, Fachsprache.',tg:['Konjunktiv II','Passiv','Konnektoren','Fachsprache'],rt:.9,gr:'Konjunktiv II alle Formen, Passiv alle Zeiten, Partizip als Adjektiv'},
+C1:{nm:'C1 — Fortgeschritten',co:'var(--or)',bg:'rgba(249,115,22,.08)',bd:'rgba(249,115,22,.15)',ds:'Nuancierte Argumentation, Konjunktiv I, Idiome.',tg:['Konjunktiv I','Idiome','Partizipialgruppen','Stilebenen'],rt:.95,gr:'Konjunktiv I, Partizipialgruppen, Funktionsverbgefüge'}
+};
+
+const SC=[
+// FREE
+{id:'f_any',c:'free',i:'🗣️',n:'Freies Thema',d:'Sprich über was du willst',l:'A1',p:'Freies Gespräch. Passe dich dem Thema an. Schlage Themen vor wenn nötig.'},
+{id:'f_tag',c:'free',i:'🌅',n:'Mein Tag',d:'Erzähle von deinem Tag',l:'A1',p:'Höre zu, stelle einfache Fragen: Was hast du gemacht? Wo warst du?'},
+{id:'f_hobby',c:'free',i:'🎨',n:'Hobbys',d:'Über Hobbys und Interessen',l:'A1',p:'Sprecht über Hobbys. Was machst du gern? Seit wann? Warum?'},
+{id:'f_wetter',c:'free',i:'🌦️',n:'Wetter',d:'Über das Wetter reden',l:'A1',p:'Sprecht übers Wetter. Wie ist es heute? Was machst du gern bei Sonne/Regen?'},
+{id:'f_fam',c:'free',i:'👨‍👩‍👧',n:'Familie',d:'Über Familie sprechen',l:'A2',p:'Sprecht über Familie. Wer gehört dazu? Was machen sie?'},
+{id:'f_reise',c:'free',i:'✈️',n:'Reiseerlebnisse',d:'Von Reisen erzählen',l:'A2',p:'Erzähle von Reisen. Wohin? Was erlebt? Was empfiehlst du?'},
+{id:'f_film',c:'free',i:'🎬',n:'Lieblingsfilm',d:'Filme empfehlen und diskutieren',l:'B1',p:'Besprecht Lieblingsfilme. Handlung, warum gut, Empfehlungen.'},
+{id:'f_zukunft',c:'free',i:'🔮',n:'Zukunftspläne',d:'Träume und Ziele',l:'B1',p:'Über Zukunftspläne sprechen. Was möchtest du erreichen?'},
+{id:'f_meinung',c:'free',i:'💭',n:'Meinung äußern',d:'Ein Thema diskutieren',l:'B2',p:'Diskutiere ein Thema. Argumente bilden, Meinung austauschen.'},
+{id:'f_kultur',c:'free',i:'🌎',n:'Kulturunterschiede',d:'Kulturen vergleichen',l:'B2',p:'Kulturunterschiede DE vs. andere Länder. Sitten, Arbeitskultur.'},
+// DAILY
+{id:'greet',c:'daily',i:'👋',n:'Sich vorstellen',d:'Name, Herkunft, Hobbys',l:'A1',p:'Erstes Treffen. Vorstellen, nach Name, Alter, Herkunft fragen.'},
+{id:'cafe',c:'daily',i:'☕',n:'Im Café',d:'Getränke bestellen',l:'A1',p:'Kellner/in im Café. Bestellung aufnehmen. Einfache Sätze.'},
+{id:'weg',c:'daily',i:'🗺️',n:'Nach dem Weg',d:'Orientierung in der Stadt',l:'A1',p:'Tourist fragt nach dem Weg. Geradeaus, links, rechts.'},
+{id:'super',c:'daily',i:'🛒',n:'Im Supermarkt',d:'Einkaufen, Produkte, Preise',l:'A2',p:'Verkäufer im Supermarkt. Produkte suchen, Preise, Angebote.'},
+{id:'rest',c:'daily',i:'🍽️',n:'Im Restaurant',d:'Bestellen, Bezahlen',l:'A2',p:'Kellner/in. Gerichte empfehlen, Bestellung, Sonderwünsche, Rechnung.'},
+{id:'kleid',c:'daily',i:'👗',n:'Kleidung kaufen',d:'Größen, Farben, Umtausch',l:'A2',p:'Bekleidungsgeschäft. Größen, Farben, Stil beraten, Umtausch.'},
+{id:'markt',c:'daily',i:'🥕',n:'Wochenmarkt',d:'Frisches Obst und Gemüse',l:'A2',p:'Wochenmarkt-Verkäufer. Preise, Mengen, saisonale Empfehlungen.'},
+{id:'koch',c:'daily',i:'👨‍🍳',n:'Zusammen kochen',d:'Rezept besprechen',l:'B1',p:'Gemeinsam kochen. Rezept, Zutaten, Zubereitungsschritte.'},
+{id:'fris',c:'daily',i:'💇',n:'Beim Friseur',d:'Haarschnitt, Smalltalk',l:'B1',p:'Friseur/in. Gewünschter Schnitt, Beratung, Smalltalk.'},
+{id:'umzug',c:'daily',i:'📦',n:'Umzug planen',d:'Möbel, Ummeldung',l:'B1',p:'Umzug planen: Möbel, Umzugsfirma, Adresse ummelden.'},
+{id:'reklam',c:'daily',i:'😤',n:'Reklamation',d:'Beschwerde, Rückgabe',l:'B2',p:'Kundenservice. Produkt-Beschwerde professionell handeln.'},
+// TRANSPORT
+{id:'bus',c:'trans',i:'🚌',n:'Bus & Bahn',d:'Fahrkarte, Verbindungen',l:'A1',p:'Fahrkartenschalter. Wohin? Wann? Einfach/Hin-Zurück?'},
+{id:'taxi',c:'trans',i:'🚕',n:'Im Taxi',d:'Ziel, Smalltalk',l:'A2',p:'Taxifahrer. Zum Ziel fahren, Smalltalk über die Stadt.'},
+{id:'flug',c:'trans',i:'✈️',n:'Am Flughafen',d:'Check-in, Gate, Probleme',l:'B1',p:'Flughafen. Check-in, Gepäck, Gate finden, Verspätungen.'},
+{id:'auto',c:'trans',i:'🚗',n:'Autovermietung',d:'Auto mieten',l:'B1',p:'Autovermietung. Fahrzeugtypen, Versicherung, Rückgabe.'},
+{id:'werk',c:'trans',i:'🔧',n:'Werkstatt',d:'Autopanne, Reparatur',l:'B2',p:'KFZ-Mechaniker. Diagnose, Kosten, Reparaturplan.'},
+// HEALTH
+{id:'apo',c:'health',i:'💊',n:'Apotheke',d:'Medikamente, Symptome',l:'A2',p:'Apotheker/in. Symptome hören, Medikamente empfehlen, Dosierung.'},
+{id:'arzt',c:'health',i:'🏥',n:'Beim Hausarzt',d:'Termin, Symptome',l:'B1',p:'Arzt/Ärztin. Symptome, Krankengeschichte, Empfehlungen.'},
+{id:'zahn',c:'health',i:'🦷',n:'Zahnarzt',d:'Zahnschmerzen',l:'B1',p:'Zahnarzt/Zahnärztin. Symptome, Behandlung erklären.'},
+{id:'krank',c:'health',i:'🚑',n:'Krankenhaus',d:'Notaufnahme, Visite',l:'B2',p:'Krankenhaus. Notaufnahme, Aufnahme, Visite, Entlassung.'},
+{id:'ther',c:'health',i:'🧠',n:'Therapeut',d:'Stress, Gefühle',l:'B2',p:'Therapeut/in. Stress, Gefühle, Work-Life-Balance.'},
+// WORK
+{id:'tag1',c:'work',i:'🏢',n:'Erster Arbeitstag',d:'Sich vorstellen',l:'A2',p:'Erster Tag. Kollegen vorstellen, Büro, Kantine, Zeiten.'},
+{id:'tel',c:'work',i:'📞',n:'Geschäftstelefonate',d:'Anrufe, Termine',l:'B1',p:'Büro-Telefonate. Entgegennehmen, verbinden, Nachricht, Termin.'},
+{id:'meet',c:'work',i:'📊',n:'Im Meeting',d:'Ideen, Diskussion',l:'B1',p:'Team-Meeting leiten. Projekt, Ideen, nächste Schritte.'},
+{id:'bew',c:'work',i:'💼',n:'Vorstellungsgespräch',d:'Erfahrung, Motivation',l:'B2',p:'Personalleiter. Erfahrung, Motivation, Stärken, Gehalt.'},
+{id:'pras',c:'work',i:'📈',n:'Präsentation',d:'Daten vorstellen',l:'B2',p:'Geschäftspräsentation. Strukturieren, Fragen beantworten.'},
+{id:'kund',c:'work',i:'🤝',n:'Kundengespräch',d:'Produkt, Verhandlung',l:'B2',p:'Du bist Kunde. Kritische Fragen, Konditionen verhandeln.'},
+{id:'geh',c:'work',i:'💰',n:'Gehaltsverhandlung',d:'Gehalt verhandeln',l:'C1',p:'Gehaltsverhandlung. Argumente, Benefits, Kompromisse.'},
+{id:'konf',c:'work',i:'⚡',n:'Teamkonflikt',d:'Probleme lösen',l:'C1',p:'Teamkonflikt diplomatisch lösen. Deeskalierende Kommunikation.'},
+// HOUSING
+{id:'wanz',c:'hous',i:'🔍',n:'Wohnungsanzeige',d:'Anrufen, Fragen',l:'A2',p:'Wohnungsanzeige. Größe, Miete, Lage, Einzugsdatum.'},
+{id:'nach',c:'hous',i:'🏘️',n:'Nachbarn',d:'Vorstellen, Regeln',l:'A2',p:'Neuer Nachbar. Vorstellen, Hausregeln, Mülltonnen.'},
+{id:'bes',c:'hous',i:'🏠',n:'Besichtigung',d:'Wohnung anschauen',l:'B1',p:'Wohnung zeigen. Zimmer, Ausstattung, Miete, Nebenkosten.'},
+{id:'hand',c:'hous',i:'🔨',n:'Handwerker',d:'Reparatur bestellen',l:'B1',p:'Handwerker. Problem beschreiben, Kosten, Termin.'},
+{id:'verm',c:'hous',i:'🔑',n:'Vermieter',d:'Probleme melden',l:'B2',p:'Vermieter. Problem melden, Lösungen besprechen.'},
+// SOCIAL
+{id:'party',c:'social',i:'🎉',n:'Auf einer Party',d:'Smalltalk, neue Leute',l:'A2',p:'Hausparty. Smalltalk: Hobbys, Arbeit, Wochenende.'},
+{id:'geb',c:'social',i:'🎂',n:'Geburtstag',d:'Glückwünsche, Geschenke',l:'A2',p:'Geburtstagsfeier. Gratulieren, Geschenk, lustige Geschichten.'},
+{id:'kneipe',c:'social',i:'🍺',n:'In der Kneipe',d:'Abend mit Freunden',l:'B1',p:'Kneipe. Getränke, Fußball, Filme, Reisen diskutieren.'},
+{id:'date',c:'social',i:'❤️',n:'Erstes Date',d:'Kennenlernen',l:'B1',p:'Erstes Date. Kennenlernen, Interessen, Komplimente.'},
+{id:'verein',c:'social',i:'⚽',n:'Sportverein',d:'Anmeldung, Training',l:'B1',p:'Sportverein. Trainingszeiten, Mitgliedschaft.'},
+{id:'kult',c:'social',i:'🎭',n:'Theater & Kino',d:'Filme diskutieren',l:'B2',p:'Film/Theaterstück besprechen. Handlung, Meinung.'},
+{id:'deb',c:'social',i:'💬',n:'Politische Diskussion',d:'Argumente austauschen',l:'C1',p:'Sachliche Diskussion: Klima, Bildung, Digitalisierung.'},
+{id:'phil',c:'social',i:'🤔',n:'Philosophie',d:'Leben und Werte',l:'C1',p:'Tiefgründig: Lebenssinn, Werte, Glück, Gesellschaft.'},
+// OFFICIAL
+{id:'anm',c:'offi',i:'📋',n:'Anmeldung Amt',d:'Wohnsitz anmelden',l:'B1',p:'Bürgeramt. Wohnsitz-Anmeldung, Dokumente, Formulare.'},
+{id:'bank',c:'offi',i:'🏦',n:'Bei der Bank',d:'Konto eröffnen',l:'B1',p:'Bankberater. Kontoeröffnung, Online-Banking.'},
+{id:'beh',c:'offi',i:'🏛️',n:'Ausländerbehörde',d:'Aufenthaltstitel',l:'B2',p:'Ausländerbehörde. Aufenthaltstitel, Dokumente, Fristen.'},
+{id:'pol',c:'offi',i:'👮',n:'Polizei',d:'Anzeige erstatten',l:'B2',p:'Polizei. Anzeige: Vorfall, Tatort, Beschreibung.'},
+{id:'vers',c:'offi',i:'📄',n:'Versicherung',d:'Beratung, Tarife',l:'B2',p:'Versicherungsberater. Typen, Tarife, Leistungen.'},
+{id:'steu',c:'offi',i:'🧮',n:'Steuerberater',d:'Steuererklärung',l:'C1',p:'Steuerberater. Steuererklärung, Freibeträge.'},
+{id:'anw',c:'offi',i:'⚖️',n:'Beim Anwalt',d:'Rechtliche Beratung',l:'C1',p:'Rechtsanwalt. Mietrecht, Arbeitsrecht beraten.'},
+// EDUCATION
+{id:'kurs',c:'edu',i:'📖',n:'Sprachkurs',d:'Grammatik üben',l:'A1',p:'Deutschlehrer A1. Grammatik, Aussprache, einfache Fragen.'},
+{id:'bib',c:'edu',i:'📚',n:'Bibliothek',d:'Bücher ausleihen',l:'A2',p:'Bibliothek. Anmelden, Bücher suchen, Regeln.'},
+{id:'nachhilfe',c:'edu',i:'✏️',n:'Nachhilfe',d:'Bei Hausaufgaben helfen',l:'B1',p:'Kind braucht Hilfe bei Hausaufgaben. Fragen, Frustration.'},
+{id:'uni',c:'edu',i:'🎓',n:'Universität',d:'Einschreibung, Kurse',l:'B2',p:'Studienberater. Einschreibung, Kurswahl, Prüfungen.'},
+{id:'vort',c:'edu',i:'🎤',n:'Referat',d:'Präsentation vorbereiten',l:'B2',p:'Referat vorbereiten. Thema, Struktur, üben.'},
+// TRAVEL
+{id:'hotel',c:'trav',i:'🏨',n:'Im Hotel',d:'Einchecken, Service',l:'A2',p:'Rezeptionist. Check-in, Services, Beschwerden.'},
+{id:'tour',c:'trav',i:'ℹ️',n:'Touristeninfo',d:'Sehenswürdigkeiten',l:'A2',p:'Touristeninformation. Empfehlungen, Tipps.'},
+{id:'reise',c:'trav',i:'🌍',n:'Reisebüro',d:'Urlaub planen',l:'B1',p:'Reiseberater. Ziele, Hotels, Flüge, Budget.'},
+{id:'wand',c:'trav',i:'🥾',n:'Wanderung',d:'Route, Ausrüstung',l:'B1',p:'Wanderung planen. Route, Schwierigkeit, Wetter.'},
+{id:'mus',c:'trav',i:'🖼️',n:'Museum',d:'Ausstellung besprechen',l:'B2',p:'Museumsführer. Kunstwerke, Geschichte erklären.'},
+// EMERGENCY
+{id:'not',c:'emer',i:'🆘',n:'Notruf 112',d:'Hilfe rufen',l:'A2',p:'Notruf 112. Was? Wo? Verletzte?'},
+{id:'unf',c:'emer',i:'🚨',n:'Verkehrsunfall',d:'Unfall melden',l:'B1',p:'Leichter Unfall. Daten tauschen, Hergang beschreiben.'},
+{id:'verl',c:'emer',i:'😰',n:'Etwas verloren',d:'Fundbüro',l:'A2',p:'Fundbüro. Was verloren, wo, wann.'},
+// TECH
+{id:'handy',c:'tech',i:'📱',n:'Handyladen',d:'Vertrag, Beratung',l:'B1',p:'Handyladen. Smartphones, Tarife, Vertrag vs Prepaid.'},
+{id:'itsup',c:'tech',i:'💻',n:'IT-Support',d:'Technisches Problem',l:'B2',p:'IT-Support. Computer-Problem diagnostizieren und lösen.'},
+{id:'ki',c:'tech',i:'🤖',n:'Über KI diskutieren',d:'Chancen und Risiken',l:'C1',p:'KI-Diskussion. Chancen, Risiken, Ethik, Zukunft.'},
+];
+
+const CATS=[
+{id:'free',i:'🗣️',n:'Freie Gespräche'},
+{id:'daily',i:'🛒',n:'Alltag & Einkaufen'},
+{id:'trans',i:'🚌',n:'Transport'},
+{id:'health',i:'🏥',n:'Gesundheit'},
+{id:'work',i:'💼',n:'Arbeit & Beruf'},
+{id:'hous',i:'🏠',n:'Wohnen'},
+{id:'social',i:'🎉',n:'Soziales & Freizeit'},
+{id:'offi',i:'🏛️',n:'Behörden & Finanzen'},
+{id:'edu',i:'📖',n:'Bildung'},
+{id:'trav',i:'🌍',n:'Reisen'},
+{id:'emer',i:'🆘',n:'Notfälle'},
+{id:'tech',i:'💻',n:'Technologie'},
+];
+
+// STATE
+const D={
+  key:localStorage.getItem('dk')||'',
+  lv:localStorage.getItem('dl')||'A1',
+  sc:null,hist:[],mode:'t',rec:false,sr:null,
+  streak:+(localStorage.getItem('ds')||'0'),
+  last:localStorage.getItem('dd')||'',
+  stats:JSON.parse(localStorage.getItem('dt')||'{"c":0,"co":0,"w":0}'),
+  mist:JSON.parse(localStorage.getItem('dm')||'[]'),
+  chats:JSON.parse(localStorage.getItem('dch')||'[]'),
+  set:{cor:true,voc:true,pro:true,str:false,slo:true},
+  oc:JSON.parse(localStorage.getItem('do')||'{}'),
+  curChatMsgs:[] // track displayed messages for saving
+};
+
+function $(id){return document.getElementById(id)}
+function esc(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
+
+// INIT
+function init(){rLv();rLvI();rSc();uSt();uStrk();if(!D.key)setTimeout(showApi,800);initSR();}
+function initSR(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window))return;
+  const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+  D.sr=new R();D.sr.lang='de-DE';D.sr.interimResults=true;D.sr.continuous=false;
+  D.sr.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;$('vtr').textContent=t;if(e.results[e.results.length-1].isFinal){stopR();if(t.trim())send(t.trim());}};
+  D.sr.onerror=e=>{stopR();$('vst').textContent=e.error==='no-speech'?'Keine Sprache erkannt':'Fehler: '+e.error;};
+  D.sr.onend=()=>{if(D.rec)stopR();};
+}
+
+// LEVEL
+function rLv(){$('lvlS').innerHTML=Object.keys(LV).map(k=>`<button class="lvb${k===D.lv?' on':''}" data-l="${k}" onclick="sLv('${k}')">${k}</button>`).join('')}
+function sLv(l){D.lv=l;localStorage.setItem('dl',l);rLv();rLvI();rSc();}
+function rLvI(){const l=LV[D.lv],e=$('lvI');e.style.background=l.bg;e.style.borderColor=l.bd;e.innerHTML=`<h2 style="color:${l.co}">${l.nm}</h2><p>${l.ds}</p><div class="lvt">${l.tg.map(t=>`<span>${t}</span>`).join('')}</div>`}
+
+// SCENARIOS
+function rSc(){
+  const box=$('scenBox'),lo=Object.keys(LV),li=lo.indexOf(D.lv);
+  const show=lo.slice(Math.max(0,li),Math.min(lo.length,li+2));
+  let h='';
+  CATS.forEach(cat=>{
+    const items=SC.filter(s=>s.c===cat.id&&show.includes(s.l));
+    if(!items.length)return;
+    const op=D.oc[cat.id]!==false;
+    h+=`<div class="cs"><div class="ch" onclick="tCat('${cat.id}')"><span class="ci">${cat.i}</span><span class="cn">${cat.n}</span><span class="cc">${items.length}</span><span class="ca${op?' op':''}">▶</span></div><div class="sg" id="c_${cat.id}" style="${op?'':'display:none'}">${items.map(s=>`<div class="sc" onclick="sSc('${s.id}')"><span class="si">${s.i}</span><div class="sn">${s.n}</div><div class="sd">${s.d}</div><span class="sl b${s.l}">${s.l}</span></div>`).join('')}</div></div>`;
+  });
+  box.innerHTML=h||'<div class="empty"><p>Keine Szenarien verfügbar.</p></div>';
+}
+function tCat(id){const g=$('c_'+id),v=g.style.display!=='none';g.style.display=v?'none':'grid';D.oc[id]=!v;localStorage.setItem('do',JSON.stringify(D.oc));g.previousElementSibling.querySelector('.ca').classList.toggle('op',!v);}
+
+// NAVIGATION
+function go(s){
+  document.querySelectorAll('.scr').forEach(e=>e.classList.remove('on'));
+  if(s==='home'){$('homeScr').classList.add('on');uSt();}
+  else if(s==='chat')$('chatScr').classList.add('on');
+  else if(s==='hist'){$('histScr').classList.add('on');showHTab('chats');}
+  else if(s==='mist'){$('mistScr').classList.add('on');rMist();}
+  else if(s==='data'){$('histScr').classList.add('on');showHTab('chats');}
+}
+
+// START CHAT
+function sSc(id){
+  const sc=SC.find(s=>s.id===id);if(!sc)return;
+  D.sc=sc;D.hist=[];D.curChatMsgs=[];
+  $('chN').textContent=sc.i+' '+sc.n;$('chH').textContent=sc.d;
+  const t=$('chT');t.textContent=sc.l;t.className='ctg b'+sc.l;
+  $('msgs').innerHTML='';go('chat');
+  addMsg('sys',`${sc.n} — ${sc.d} (${sc.l})`);
+  callAI(sysP(sc),[{role:'user',content:'Starte das Gespräch. Begrüße mich passend zum Szenario.'}],true);
+}
+function startFree(){
+  D.sc={id:'free',i:'🗣️',n:'Freies Gespräch',d:'Sprich über alles',l:D.lv,p:'Freies Gespräch auf Deutsch. Passe dich dem Thema an. Schlage 2-3 Themen vor wenn der Benutzer unsicher ist.'};
+  D.hist=[];D.curChatMsgs=[];
+  $('chN').textContent='🗣️ Freies Gespräch';$('chH').textContent='Sprich über alles';
+  const t=$('chT');t.textContent=D.lv;t.className='ctg b'+D.lv;
+  $('msgs').innerHTML='';go('chat');
+  addMsg('sys','Freies Gespräch — '+D.lv);
+  callAI(sysP(D.sc),[{role:'user',content:'Begrüße mich, schlage 2-3 Gesprächsthemen vor und stelle eine Frage.'}],true);
+}
+function endChat(){
+  // Auto-save chat if it has messages
+  if(D.curChatMsgs.length>1){
+    const chat={id:Date.now(),name:D.sc?.n||'Chat',icon:D.sc?.i||'💬',level:D.sc?.l||D.lv,date:new Date().toISOString(),messages:D.curChatMsgs};
+    D.chats.unshift(chat);
+    if(D.chats.length>50)D.chats=D.chats.slice(0,50);
+    localStorage.setItem('dch',JSON.stringify(D.chats));
+  }
+  go('home');
+}
+
+// MESSAGES
+function addMsg(type,html,save=true){
+  const c=$('msgs'),d=document.createElement('div');
+  d.className='msg '+(type==='sys'?'sys':type==='usr'?'usr':'bot');
+  d.innerHTML=html;c.appendChild(d);c.scrollTop=c.scrollHeight;
+  if(save)D.curChatMsgs.push({type,html,time:Date.now()});
+  return d;
+}
+function addTyp(){const c=$('msgs'),d=document.createElement('div');d.className='typ';d.id='typI';d.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';c.appendChild(d);c.scrollTop=c.scrollHeight;}
+function rmTyp(){const e=$('typI');if(e)e.remove();}
+
+// SEND
+function send(vt){
+  const t=vt||$('inp').value.trim();if(!t)return;
+  if(!D.key){showApi();return;}
+  addMsg('usr',esc(t));
+  if(!vt){$('inp').value='';$('inp').style.height='auto';}
+  D.hist.push({role:'user',content:t});addTyp();
+  callAI(sysP(D.sc),D.hist,false);
+}
+
+// SYSTEM PROMPT
+function sysP(sc){
+  const lv=sc.l||D.lv,li=LV[lv]||LV.A1;
+  const rules={A1:'NUR einfache kurze Sätze (1-2). Nur Präsens. Grundwortschatz. IMMER englische Übersetzung.',A2:'Einfache-mittlere Sätze (2-3). Perfekt, Modalverben. Alltagswortschatz. Übersetzungen bei schwierigen Wörtern.',B1:'Komplexere Sätze (3-4). Konjunktiv II, Relativsätze, Passiv. Redewendungen. Englisch bei Bedarf.',B2:'Anspruchsvoll, Konnektoren. Konjunktiv II, Passiv alle Zeiten. Fachvokabular. Längere Antworten fördern.',C1:'Gehobene Sprache, Konjunktiv I, Idiome, Partizipialgruppen. Nuancierte Antworten. Korrekturen auf Deutsch.'};
+  return `Du bist DeutschCoach, ein freundlicher KI-Sprachpartner.
+NIVEAU: ${lv} (${li.nm}) | GRAMMATIK: ${li.gr}
+SZENARIO: ${sc.p}
+REGELN: ${rules[lv]||rules.A1}
+${D.set.cor?'Korrigiere JEDEN Fehler.':'Nur schwere Fehler.'}
+${D.set.voc?'Erkläre neue Wörter.':''}${D.set.pro?' Aussprache-Tipps.':''}
+${D.set.str?'NUR Deutsch.':lv==='A1'||lv==='A2'?'Englisch bei Schwierigkeiten.':''}
+Lobe gute Sätze! Stelle immer eine Folgefrage.
+ANTWORTE NUR als JSON: {"reply":"...","corrections":[{"wrong":"...","right":"...","explanation":"...","category":"grammar|vocabulary|word-order|case|gender|conjugation"}],"vocabulary":[{"word":"...","meaning":"...","example":"..."}],"hint":"...","praise":"..."}`;
+}
+
+// CLAUDE API
+async function callAI(sys,msgs,init){
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':D.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1024,system:sys,messages:init?msgs:[...msgs]})});
+    rmTyp();
+    if(!r.ok){const e=await r.json();addMsg('sys','⚠️ '+(e.error?.message||r.statusText));return;}
+    const d=await r.json(),ct=d.content[0].text;
+    let p;try{const m=ct.match(/\{[\s\S]*\}/);p=JSON.parse(m?m[0]:ct);}catch(e){const msg=addMsg('bot',esc(ct));addSpk(msg,ct);if(!init)D.hist.push({role:'assistant',content:ct});return;}
+    let h=`<div>${esc(p.reply)}</div>`;
+    if(p.praise)h+=`<div style="margin-top:5px;color:var(--gn);font-size:11px">✨ ${esc(p.praise)}</div>`;
+    if(p.corrections?.length){p.corrections.forEach(c=>{h+=`<div class="cor"><div class="lb">✏️ Korrektur</div><span class="cw">${esc(c.wrong)}</span> → <span class="cr">${esc(c.right)}</span><div class="ce">${esc(c.explanation)}</div></div>`;saveMi(c);});D.stats.co+=p.corrections.length;}
+    if(p.vocabulary?.length){p.vocabulary.forEach(v=>{h+=`<div class="voc"><div class="lb">📚 Vokabel</div><strong>${esc(v.word)}</strong> — ${esc(v.meaning)}${v.example?`<div style="margin-top:2px;font-style:italic;opacity:.8">"${esc(v.example)}"</div>`:''}</div>`;D.stats.w++;});}
+    if(p.hint)h+=`<div class="hnt"><div class="lb">💡 Tipp</div>${esc(p.hint)}</div>`;
+    const msg=addMsg('bot',h);addSpk(msg,p.reply);
+    if(!init)D.hist.push({role:'assistant',content:ct});else D.hist=[{role:'assistant',content:ct}];
+    if(init)D.stats.c++;uStrk();savD();
+  }catch(e){rmTyp();addMsg('sys','⚠️ '+e.message);}
+}
+
+// TTS
+function addSpk(el,txt){if(!('speechSynthesis' in window))return;const b=document.createElement('button');b.className='spk';b.innerHTML='🔊 Anhören';b.onclick=()=>spk(txt);el.appendChild(b);}
+function spk(txt){if(!('speechSynthesis' in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang='de-DE';const lv=D.sc?.l||D.lv;u.rate=D.set.slo?(LV[lv]?.rt||.85):1;const v=speechSynthesis.getVoices(),de=v.find(x=>x.lang.startsWith('de'));if(de)u.voice=de;speechSynthesis.speak(u);}
+if('speechSynthesis' in window)speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+
+// VOICE
+function setMode(m){D.mode=m;$('mtT').classList.toggle('on',m==='t');$('mtV').classList.toggle('on',m==='v');$('tia').classList.toggle('off',m==='v');$('via').classList.toggle('on',m==='v');}
+function togRec(){if(!D.sr){$('vst').textContent='Nicht verfügbar';return;}D.rec?stopR():startR();}
+function startR(){D.rec=true;$('micB').classList.add('rec');$('vst').textContent='Höre zu...';$('vtr').textContent='...';try{D.sr.start();}catch(e){}}
+function stopR(){D.rec=false;$('micB').classList.remove('rec');$('vst').textContent='Tippe zum Sprechen';try{D.sr.stop();}catch(e){}}
+
+// MISTAKES
+function saveMi(c){D.mist.unshift({w:c.wrong,r:c.right,e:c.explanation,c:c.category||'grammar',d:new Date().toISOString()});if(D.mist.length>200)D.mist=D.mist.slice(0,200);savD();}
+function rMist(){
+  const el=$('mistC');
+  if(!D.mist.length){el.innerHTML='<div class="empty"><div class="ic">📝</div><p>Noch keine Fehler!</p></div>';return;}
+  const cm={grammar:{l:'Grammatik',c:'cg'},vocabulary:{l:'Wortschatz',c:'cv'},'word-order':{l:'Wortstellung',c:'cw'},case:{l:'Kasus',c:'cg'},gender:{l:'Genus',c:'cg'},conjugation:{l:'Konjugation',c:'cg'}};
+  el.innerHTML=`<div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:var(--t3)">${D.mist.length} Fehler</span><button onclick="clrMi()" style="background:none;border:1px solid var(--bd);color:var(--t3);padding:4px 9px;border-radius:6px;font-size:10px;cursor:pointer;font-family:inherit">Löschen</button></div>${D.mist.map(m=>{const ct=cm[m.c]||cm.grammar;return`<div class="mk"><span class="mc ${ct.c}">${ct.l}</span><div class="mw">${esc(m.w)}</div><div class="mr">→ ${esc(m.r)}</div><div class="me">${esc(m.e)}</div></div>`;}).join('')}`;
+}
+function clrMi(){if(confirm('Alle Fehler löschen?')){D.mist=[];savD();rMist();}}
+
+// HISTORY TABS
+function showHTab(tab){
+  $('htC').classList.toggle('on',tab==='chats');$('htM').classList.toggle('on',tab==='mist');
+  const box=$('histBox');
+  if(tab==='chats'){
+    if(!D.chats.length){box.innerHTML='<div class="empty"><div class="ic">💬</div><p>Noch keine gespeicherten Chats. Chats werden automatisch gespeichert wenn du zurückgehst.</p></div>';return;}
+    box.innerHTML=D.chats.map((c,i)=>{
+      const d=new Date(c.date);const ds=d.toLocaleDateString('de-DE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+      const last=c.messages?.filter(m=>m.type==='bot')[0];
+      return`<div class="hc" onclick="loadChat(${i})"><div class="ht">${c.icon||'💬'} ${esc(c.name)} <span class="sl b${c.level}" style="font-size:8px;padding:1px 5px">${c.level}</span></div><div class="hd">${ds} · ${c.messages?.length||0} Nachrichten</div>${last?`<div class="hm">${esc(last.html?.replace(/<[^>]*>/g,'').slice(0,80)||'')}</div>`:''}</div>`;
+    }).join('')+`<button onclick="clrChats()" style="width:100%;margin-top:8px;background:none;border:1px solid var(--bd);color:var(--t3);padding:8px;border-radius:8px;font-size:10px;cursor:pointer;font-family:inherit">Alle Chats löschen</button>`;
+  } else {
+    if(!D.mist.length){box.innerHTML='<div class="empty"><div class="ic">📝</div><p>Noch keine Fehler!</p></div>';return;}
+    const cm={grammar:{l:'Grammatik',c:'cg'},vocabulary:{l:'Wortschatz',c:'cv'},'word-order':{l:'Wortstellung',c:'cw'},case:{l:'Kasus',c:'cg'},gender:{l:'Genus',c:'cg'},conjugation:{l:'Konjugation',c:'cg'}};
+    box.innerHTML=D.mist.map(m=>{const ct=cm[m.c]||cm.grammar;return`<div class="mk"><span class="mc ${ct.c}">${ct.l}</span><div class="mw">${esc(m.w)}</div><div class="mr">→ ${esc(m.r)}</div><div class="me">${esc(m.e)}</div></div>`;}).join('');
+  }
+}
+function loadChat(i){
+  const c=D.chats[i];if(!c)return;
+  D.sc={id:'loaded',i:c.icon,n:c.name,d:'Gespeicherter Chat',l:c.level,p:'Setze das Gespräch fort.'};
+  D.hist=[];D.curChatMsgs=[];
+  $('chN').textContent=(c.icon||'💬')+' '+c.name;$('chH').textContent='Gespeicherter Chat';
+  const t=$('chT');t.textContent=c.level;t.className='ctg b'+c.level;
+  $('msgs').innerHTML='';go('chat');
+  // Replay messages
+  (c.messages||[]).forEach(m=>{
+    const d=document.createElement('div');
+    d.className='msg '+(m.type==='sys'?'sys':m.type==='usr'?'usr':'bot');
+    d.innerHTML=m.html;$('msgs').appendChild(d);
+    D.curChatMsgs.push(m);
+    // Rebuild hist for API
+    if(m.type==='usr')D.hist.push({role:'user',content:m.html.replace(/<[^>]*>/g,'')});
+    else if(m.type==='bot')D.hist.push({role:'assistant',content:m.html.replace(/<[^>]*>/g,'')});
+  });
+  $('msgs').scrollTop=$('msgs').scrollHeight;
+}
+function clrChats(){if(confirm('Alle Chats löschen?')){D.chats=[];localStorage.setItem('dch','[]');showHTab('chats');}}
+
+// EXPORT / IMPORT
+function exportData(){
+  const data={version:2,date:new Date().toISOString(),stats:D.stats,mistakes:D.mist,chats:D.chats,level:D.lv,streak:D.streak,lastDate:D.last};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`deutschcoach_backup_${new Date().toISOString().slice(0,10)}.json`;a.click();
+  URL.revokeObjectURL(url);
+}
+function importData(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(data.stats)D.stats=data.stats;
+      if(data.mistakes)D.mist=data.mistakes;
+      if(data.chats)D.chats=data.chats;
+      if(data.level){D.lv=data.level;localStorage.setItem('dl',D.lv);}
+      if(data.streak){D.streak=data.streak;localStorage.setItem('ds',D.streak);}
+      if(data.lastDate){D.last=data.lastDate;localStorage.setItem('dd',D.last);}
+      savD();localStorage.setItem('dch',JSON.stringify(D.chats));
+      uSt();uStrk();rLv();rLvI();rSc();
+      alert('✅ Daten erfolgreich importiert! '+D.chats.length+' Chats, '+D.mist.length+' Fehler.');
+      showHTab('chats');
+    }catch(err){alert('❌ Fehler beim Importieren: '+err.message);}
+  };
+  reader.readAsText(file);event.target.value='';
+}
+
+// SETTINGS
+function togSet(){$('setP').classList.toggle('on');}
+function togS(el){el.classList.toggle('on');const m={tgCor:'cor',tgVoc:'voc',tgPro:'pro',tgStr:'str',tgSlo:'slo'};const k=m[el.id];if(k)D.set[k]=el.classList.contains('on');}
+
+// API
+function showApi(){$('apiMo').classList.add('on');$('apiIn').value=D.key;const s=$('apiS');s.className='apis';s.style.display='none';}
+function closeApi(){$('apiMo').classList.remove('on');}
+async function saveApi(){
+  const k=$('apiIn').value.trim();if(!k)return;
+  const s=$('apiS');s.textContent='⏳ Teste...';s.style.display='block';s.style.background='rgba(245,166,35,.1)';s.style.color='var(--gd)';s.style.border='1px solid rgba(245,166,35,.2)';s.className='apis';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:50,messages:[{role:'user',content:'Sag "Hallo!"'}]})});
+    if(r.ok){D.key=k;localStorage.setItem('dk',k);s.textContent='✅ Verbunden!';s.className='apis ok';setTimeout(closeApi,1000);}
+    else{const e=await r.json();s.textContent='❌ '+(e.error?.message||'Ungültig');s.className='apis er';}
+  }catch(e){s.textContent='❌ '+e.message;s.className='apis er';}
+}
+
+// STATS
+function uStrk(){const today=new Date().toDateString();if(D.last!==today){const y=new Date(Date.now()-864e5).toDateString();D.streak=D.last===y?D.streak+1:1;D.last=today;localStorage.setItem('dd',today);localStorage.setItem('ds',D.streak);}$('strk').textContent=D.streak;}
+function uSt(){$('s1').textContent=D.stats.c;$('s2').textContent=D.stats.co;$('s3').textContent=D.stats.w;}
+function savD(){localStorage.setItem('dt',JSON.stringify(D.stats));localStorage.setItem('dm',JSON.stringify(D.mist));}
+
+init();
+</script>
+</body>
+</html>
